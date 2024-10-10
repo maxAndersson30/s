@@ -4,22 +4,14 @@ import Dexie, { Table } from "dexie"
 import dexieCloud from "dexie-cloud-addon"
 import qs from "qs"
 import { populate } from "../lib/populate"
+import { useLiveQuery } from "dexie-react-hooks"
 
 export interface ICard {
   id: string
-  type: "image" | "note" | "quote" | "checklist"
+  type: "image" | "text"
   content?: string[]
-  title?: string
-  price?: string
-  author?: string
   description?: string
-  createdAt?: Date
-  createdBy?: string
-  updatedAt?: Date
-  updatedBy?: string
-  isDeleted?: boolean
-  deletedAt?: Date
-  deletedBy?: string
+  createdAt: string
   realmId?: string
   owner?: string
 }
@@ -31,10 +23,22 @@ export class DexieStarter extends Dexie {
     super("DexieStarter", { addons: [dexieCloud] })
 
     this.version(1).stores({
-      card: `id, type, *content, title, price, author, description, createdAt, createdBy, updatedAt, updatedBy, isDeleted, deletedAt, deletedBy, realmId, owner`,
+      card: `id, type, *content, description, createdAt, realmId, owner`,
       setting_local: "++id, key, value",
     })
   }
+}
+
+export const useLiveDataCards = (): ICard[] => {
+  const cards = useLiveQuery(async () => {
+    try {
+      return await db.card.toArray()
+    } catch (e) {
+      return []
+    }
+  }, []) as ICard[]
+
+  return cards?.sort((a, b) => b.createdAt?.localeCompare(a.createdAt)) || []
 }
 
 let db: DexieStarter
@@ -44,25 +48,6 @@ try {
   console.log("Database initialized successfully")
 } catch (error) {
   console.error("Failed to initialize the database:", error)
-
-  // Kontrollera om error är en instans av Error
-  let errorMessage = "An error occurred while initializing the database."
-
-  if (error instanceof Error) {
-    errorMessage += `\nDetails: ${error.message}`
-    if (error.stack) {
-      errorMessage += `\nStack trace: ${error.stack}`
-    }
-  } else {
-    // Om det är något annat än en Error, konvertera det till en sträng
-    errorMessage += `\nDetails: ${String(error)}`
-  }
-
-  // Visa felmeddelandet med stacken i en alert
-  alert(errorMessage)
-
-  // Sätt db till null eller vidta andra åtgärder
-  db = null as any
 }
 
 const query =
@@ -73,7 +58,7 @@ const query =
 // Konfiguration av Dexie Cloud
 const configureDexieCloud = () => {
   try {
-    const configure = db.cloud.configure({
+    db.cloud.configure({
       databaseUrl:
         process.env.NEXT_PUBLIC_DEXIE_CLOUD_DB_URL ||
         "https://your-dexie-db.dexie.cloud",
@@ -85,61 +70,15 @@ const configureDexieCloud = () => {
       customLoginGui: true,
       unsyncedTables: ["setting_local"],
     })
-    console.log("Dexie Cloud configured successfully", configure)
+    console.log("Dexie Cloud configured successfully")
   } catch (error) {
-    let errorMessage =
-      "An unknown error occurred during Dexie Cloud configuration."
-    if (error instanceof Error) {
-      errorMessage = error.message
-    }
-    console.error("Failed to configure Dexie Cloud:", errorMessage)
+    console.error(error)
   }
 }
 
-// Hantering av första gångens databaspopulation
-const handleFirstTimePopulate = async (initdb: DexieStarter) => {
-  try {
-    console.log("POPULATE 1: ", initdb.cloud.currentUserId)
-
-    initdb.cloud.events.syncComplete.subscribe(async () => {
-      console.log("POPULATE 2: ", initdb.cloud.currentUserId)
-
-      try {
-        console.log("POPULATE 3: ", initdb.cloud.currentUserId)
-        if (initdb.cloud.currentUserId !== "unauthorized") {
-          const populated = await initdb.card.count()
-          console.log("Database populated count:", populated)
-          if (populated === 0) {
-            await populate()
-            console.log("Database populated for the first time.")
-          }
-        } else {
-          console.log("Unauthorized user detected during sync.")
-        }
-      } catch (error) {
-        let errorMessage =
-          "An error occurred during syncComplete event handling."
-        if (error instanceof Error) {
-          errorMessage = error.message
-        }
-        console.error("Error during syncComplete event handling:", errorMessage)
-      }
-    })
-  } catch (error) {
-    let errorMessage = "Failed to subscribe to syncComplete event."
-    if (error instanceof Error) {
-      errorMessage = error.message
-    }
-    console.error(errorMessage, error)
-  }
-}
-
-// Initiering av databasen
 const initializeDatabase = async () => {
   try {
     configureDexieCloud()
-
-    db.on("ready", () => handleFirstTimePopulate(db))
 
     db.on("blocked", (blocked: any) => {
       const errorMessage =

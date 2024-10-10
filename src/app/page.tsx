@@ -6,11 +6,14 @@ import { useEffect, useState } from "react"
 import SignIn from "./signin"
 import { DXCUserInteraction } from "dexie-cloud-addon"
 import { useRouter, useSearchParams } from "next/navigation"
+import { populate } from "./lib/populate"
 
 export default function Home() {
   db.open().catch((err) => {
     console.error(err)
   })
+
+  populate()
 
   const router = useRouter()
   const [showLogin, setShowLogin] = useState(false)

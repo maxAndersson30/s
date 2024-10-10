@@ -16,7 +16,7 @@ import { useObservable } from "dexie-react-hooks"
 import { useRouter } from "next/navigation"
 
 import { ReactNode, useEffect } from "react"
-import { db } from "./db/db"
+import { db } from "../db/db"
 
 export default function Template({ children }: { children: ReactNode }) {
   const router = useRouter()
@@ -102,6 +102,7 @@ export default function Template({ children }: { children: ReactNode }) {
               borderTop: `solid 4px transparent`,
               pt: 1,
             }}
+            onClick={() => db.card.clear()}
           >
             Serendipity
           </Typography>
