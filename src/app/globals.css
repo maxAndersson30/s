@@ -35,8 +35,54 @@ a {
   text-decoration: none;
 }
 
+.tiptap p.is-editor-empty:first-child::before {
+  color: #adb5bd;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.ProseMirror-focused {
+  outline: none; /* Tar bort blå border */
+  box-shadow: none; /* Tar bort eventuell skugga */
+}
+
+.editor-content p {
+  min-height: 1em; /* Sätter ett minimihöjd för att visa mellanrum */
+}
+
+.editor-content p:empty::before {
+  content: "\00a0"; /* Tvingar en tom <p> att visa ett mellanrum */
+}
+
+/* Masonry container */
+.my-masonry-grid {
+  display: flex;
+  margin-left: -30px; /* justera detta beroende på gapet */
+  width: auto;
+}
+
+/* Kolumnklassen */
+.my-masonry-grid_column {
+  padding-left: 30px; /* justera detta beroende på gapet */
+  background-clip: padding-box;
+}
+
+/* Varje enskilt kort i masonryn */
+.my-masonry-grid_column > div {
+  margin-bottom: 30px; /* justera detta beroende på önskat avstånd */
+}
+
+.MuiCardContent-root:last-child {
+  /* Sätt de stilar du vill ha här */
+  padding-bottom: 16px !important;
+}
+
+
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
   }
 }
+

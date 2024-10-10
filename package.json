@@ -13,6 +13,10 @@
     "@emotion/styled": "^11.13.0",
     "@mui/icons-material": "^6.1.3",
     "@mui/material-nextjs": "^6.1.3",
+    "@tiptap/extension-placeholder": "^2.8.0",
+    "@tiptap/pm": "^2.8.0",
+    "@tiptap/react": "^2.8.0",
+    "@tiptap/starter-kit": "^2.8.0",
     "dayjs": "^1.11.13",
     "dexie": "^4.0.4",
     "dexie-cloud": "^1.2.1",
@@ -23,6 +27,7 @@
     "qs": "^6.13.0",
     "react": "^18",
     "react-dom": "^18",
+    "react-masonry-css": "^1.0.16",
     "uuid": "^10.0.0"
   },
   "devDependencies": {

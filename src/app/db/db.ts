@@ -9,9 +9,9 @@ import { useLiveQuery } from "dexie-react-hooks"
 export interface ICard {
   id: string
   type: "image" | "text"
+  createdAt: string
   content?: string[]
   description?: string
-  createdAt: string
   realmId?: string
   owner?: string
 }
@@ -29,6 +29,22 @@ export class DexieStarter extends Dexie {
   }
 }
 
+export const createCard = async (card: ICard) => {
+  try {
+    await db.card.add(card)
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+export const updateCard = async (id: string, content: string) => {
+  try {
+    await db.card.where("id").equals(id).modify({ description: content })
+  } catch (e) {
+    console.error(e)
+  }
+}
+
 export const useLiveDataCards = (): ICard[] => {
   const cards = useLiveQuery(async () => {
     try {
@@ -39,6 +55,14 @@ export const useLiveDataCards = (): ICard[] => {
   }, []) as ICard[]
 
   return cards?.sort((a, b) => b.createdAt?.localeCompare(a.createdAt)) || []
+}
+
+export const getCardById = async (id: string): Promise<ICard | undefined> => {
+  try {
+    return await db.card.where("id").equals(id).first()
+  } catch (e) {
+    return
+  }
 }
 
 let db: DexieStarter
