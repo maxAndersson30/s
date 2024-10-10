@@ -8,8 +8,8 @@ import Tiptap from "@/app/components/tiptap"
 import theme from "@/theme"
 import Button from "@mui/material/Button"
 import { Typography, CardContent } from "@mui/material"
-import { ContentCard } from "../(pages)/everything/page"
 import { useSearch } from "../(pages)/SearchContext"
+import { ContentCard, ContentWrapper } from "./item-card"
 
 const NewCard = () => {
   const [isEdited, setIsEdited] = useState(false)
@@ -41,45 +41,48 @@ const NewCard = () => {
           position: "relative",
           pb: 4,
         }}
+        isScaled={false}
       >
-        <CardContent>
-          <Typography
-            variant="body2"
-            sx={{
-              color: theme.palette.primary.main,
-              fontSize: "0.75rem",
-              pb: 0.5,
-            }}
-          >
-            ADD NEW NOTE
-          </Typography>
-
-          <Tiptap
-            content=""
-            setIsEdited={setIsEdited}
-            setCanPost={setCanPost}
-            setIsEditorEmpty={setIsEditorEmpty}
-            getContent={setEditorContent}
-            onPost={handlePost} // Skicka in handlePost-funktionen
-          />
-          {canPost && (
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handlePost(editorContent)}
-              disabled={!canPost}
+        <ContentWrapper scaleFactor={1}>
+          <CardContent>
+            <Typography
+              variant="body2"
               sx={{
-                position: "absolute",
-                bottom: 0,
-                right: 0,
-                width: "100%",
-                borderRadius: 0,
+                color: theme.palette.primary.main,
+                fontSize: "0.75rem",
+                pb: 0.5,
               }}
             >
-              PRESS CTRL+ENTER TO SAVE
-            </Button>
-          )}
-        </CardContent>
+              ADD NEW NOTE
+            </Typography>
+
+            <Tiptap
+              content=""
+              setIsEdited={setIsEdited}
+              setCanPost={setCanPost}
+              setIsEditorEmpty={setIsEditorEmpty}
+              getContent={setEditorContent}
+              onPost={handlePost} // Skicka in handlePost-funktionen
+            />
+            {canPost && (
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => handlePost(editorContent)}
+                disabled={!canPost}
+                sx={{
+                  position: "absolute",
+                  bottom: 0,
+                  right: 0,
+                  width: "100%",
+                  borderRadius: 0,
+                }}
+              >
+                PRESS CTRL+ENTER TO SAVE
+              </Button>
+            )}
+          </CardContent>
+        </ContentWrapper>
       </ContentCard>
     </div>
   )

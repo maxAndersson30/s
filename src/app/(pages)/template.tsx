@@ -115,7 +115,10 @@ function SearchField() {
       value={searchKeyword}
       onChange={(e) => setSearchKeyword(e.target.value)} // Uppdaterar sökordet
       InputProps={{
-        style: { font: "400 70px / 84px 'times'", fontStyle: "italic" },
+        style: {
+          font: "400 70px / 84px var(--font-caveat)",
+          fontStyle: "italic",
+        },
       }}
       sx={{
         flexGrow: 1,

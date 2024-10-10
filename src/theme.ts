@@ -3,7 +3,7 @@ import { createTheme } from "@mui/material/styles"
 
 const theme = createTheme({
   typography: {
-    fontFamily: "var(--font-geist-sans)",
+    fontFamily: "var(--font-ibm-plex-sans)",
   },
   palette: {
     primary: {

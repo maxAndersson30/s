@@ -14,6 +14,7 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
+  font-family: var(--font-roboto);
 }
 
 body {
@@ -33,6 +34,17 @@ body {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+h1 {
+  display: block;
+  font-size: 2em;
+  margin-block-start: 0.67em;
+  margin-block-end: 0.67em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  font-weight: bold;
+  unicode-bidi: isolate;
 }
 
 .tiptap p.is-editor-empty:first-child::before {

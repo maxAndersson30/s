@@ -1,34 +1,17 @@
 "use client"
 
-import styled from "@emotion/styled"
-import {
-  Typography,
-  Box,
-  Card,
-  CardContent,
-  CardMedia,
-  CircularProgress,
-  alpha,
-} from "@mui/material"
+import { Box, CircularProgress, alpha } from "@mui/material"
 import Dialog from "@mui/material/Dialog"
 import DialogContent from "@mui/material/DialogContent"
 import theme from "@/theme"
-import { getCardById, ICard, updateCard, useLiveDataCards } from "../../db/db"
+import { getCardById, updateCard, useLiveDataCards } from "../../db/db"
 import Tiptap from "@/app/components/tiptap"
 import { useEffect, useState } from "react"
-import dayjs from "dayjs"
 import Masonry from "react-masonry-css"
 import { useRouter, useSearchParams } from "next/navigation"
 import NewCard from "@/app/components/new-card"
 import { useSearch } from "../SearchContext"
 import ItemCard from "@/app/components/item-card"
-
-export const ContentCard = styled(Card)({
-  height: "100%",
-  display: "flex",
-  flexDirection: "column",
-  boxShadow: "3px 10px 37px -4px rgba(42, 52, 68, 0.5)",
-})
 
 const breakpointColumnsObj = {
   default: 4,
@@ -145,7 +128,7 @@ export default function Everything() {
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              width: "300px",
+              minWidth: "300px",
               borderRadius: 2,
             }}
           ></Box>
