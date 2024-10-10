@@ -3,9 +3,6 @@
 import Dexie, { Table } from "dexie"
 import dexieCloud from "dexie-cloud-addon"
 import qs from "qs"
-import dotenv from "dotenv"
-
-dotenv.config()
 
 interface Card {
   id: string
@@ -35,7 +32,7 @@ export class DexieStarter extends Dexie {
     this.version(1).stores({
       card: `
           id, type, *content, title, price, author, description, createdAt, createdBy, updatedAt, updatedBy, isDeleted, deletedAt, deletedBy, realmId, owner`,
-      settings_local: "++id, key, value",
+      setting_local: "++id, key, value",
     })
   }
 }
@@ -79,7 +76,8 @@ const configureDexieCloud = () => {
   try {
     const configure = db.cloud.configure({
       databaseUrl:
-        process.env.DEXIE_CLOUD_DB_URL || "https://your-dexie-db.dexie.cloud",
+        process.env.NEXT_PUBLIC_DEXIE_CLOUD_DB_URL ||
+        "https://your-dexie-db.dexie.cloud",
       requireAuth: {
         email: query.email?.toString(),
         otpId: query.otpId?.toString(),

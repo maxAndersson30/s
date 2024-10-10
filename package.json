@@ -16,7 +16,6 @@
     "dexie": "^4.0.8",
     "dexie-cloud-addon": "^4.0.8",
     "dexie-react-hooks": "^1.1.7",
-    "dotenv": "^16.4.5",
     "lodash": "^4.17.21",
     "next": "14.2.15",
     "qs": "^6.13.0",

@@ -3,7 +3,7 @@
 import { useObservable } from "dexie-react-hooks"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import Head from "next/head"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { DXCUserInteraction, resolveText } from "dexie-cloud-addon"
 import { uniqBy } from "lodash"
 import {
@@ -18,26 +18,61 @@ import {
 } from "@mui/material"
 import { db } from "./db/db"
 import { ArrowBack, ArrowCircleRight, Check } from "@mui/icons-material"
+import { styled } from "@mui/material/styles"
+
+const StyledDiv = styled("div")(({ theme }) => ({
+  backgroundColor: `${theme.palette.primary.light} !important`,
+  "& h3": {
+    marginTop: "0px",
+  },
+  "& form": {
+    marginBottom: "20px",
+  },
+  "& input[type=otp], & input[type=email]": {
+    borderRadius: "5px",
+    fontSize: "1rem !important",
+    padding: "15px 15px",
+    cursor: "pointer",
+  },
+  "& button": {
+    borderRadius: "5px",
+    fontSize: "1rem",
+    border: "none",
+    padding: "10px 15px",
+    cursor: "pointer",
+  },
+  "& button[type=submit]": {
+    backgroundColor: theme.palette.primary.main,
+    color: "white",
+    marginRight: "10px",
+  },
+  "& > div > div": {
+    border: "none !important",
+    boxShadow: `${alpha(
+      theme.palette.primary.main,
+      1
+    )} 0px 0px 80px 10px !important`,
+  },
+}))
+
+interface Field {
+  type: string
+  label: string
+  placeholder: string
+}
+
+interface MyFields {
+  [key: string]: Field
+}
 
 export default function SignIn({ fields, onSubmit }: DXCUserInteraction) {
   const [params, setParams] = useState<{ [param: string]: string }>({})
   const theme = useTheme()
   const router = useRouter()
-  const {
-    id,
-    otp,
-    email,
-    affiliate,
-    utm_source,
-    utm_content,
-    utm_medium,
-    utm_term,
-    utm_campaign,
-  } = router.query
+  const searchParams = useSearchParams() // Use searchParams instead of router.query
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"))
   const firstFieldRef = useRef<HTMLInputElement>(null)
-  const logoRef = useRef(null)
-  const [myFields, setMyFields] = useState(undefined)
+  const [myFields, setMyFields] = useState<MyFields | undefined>(undefined)
   const [success, setSuccess] = useState(false)
   const ui = useObservable(db.cloud.userInteraction)
   const currenUser = useObservable(db.cloud.currentUser)
@@ -69,7 +104,6 @@ export default function SignIn({ fields, onSubmit }: DXCUserInteraction) {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      // console.log("params", params)
       if (params["fromCode"]?.length && params["fromCode"] == "true") {
         mySubmit(undefined)
         const { fromCode, ...restOfParams } = params
@@ -81,20 +115,23 @@ export default function SignIn({ fields, onSubmit }: DXCUserInteraction) {
     return () => {
       clearInterval(timer)
     }
-    // console.log("params", params)
   }, [mySubmit, params])
 
   useEffect(() => {
+    const otp = searchParams.get("otp")
+    const email = searchParams.get("email")
+    const id = searchParams.get("id")
+
     if (otp != undefined && otp != params["otp"]) {
       setParams({
         ...params,
-        ["email"]: email ? email.toString() : ("" as string),
-        ["otp"]: otp ? otp.toString().toUpperCase() : ("" as string),
-        ["otpId"]: id ? id.toString().toUpperCase() : ("" as string),
+        ["email"]: email ? email.toString() : "",
+        ["otp"]: otp ? otp.toString().toUpperCase() : "",
+        ["otpId"]: id ? id.toString().toUpperCase() : "",
         ["fromCode"]: "true",
       })
     }
-  }, [otp, email, mySubmit, params]) // important, only use code here
+  }, [searchParams, mySubmit, params])
 
   useEffect(() => {
     if (fields != undefined && fields != myFields) {
@@ -103,7 +140,7 @@ export default function SignIn({ fields, onSubmit }: DXCUserInteraction) {
   }, [fields, myFields])
 
   const reset = () => {
-    router.reload()
+    router.refresh() // For refreshing the page
   }
 
   const [additionalAlerts, setAdditionalAlerts] = useState<
@@ -122,21 +159,6 @@ export default function SignIn({ fields, onSubmit }: DXCUserInteraction) {
   const alerts = useMemo(() => {
     return additionalAlerts ?? ui?.alerts
   }, [additionalAlerts, ui?.alerts])
-
-  useEffect(() => {
-    if (affiliate != undefined)
-      localStorage.setItem("affiliate", affiliate as string)
-    if (utm_source != undefined)
-      localStorage.setItem("utm_source", utm_source as string)
-    if (utm_content != undefined)
-      localStorage.setItem("utm_content", utm_content as string)
-    if (utm_medium != undefined)
-      localStorage.setItem("utm_medium", utm_medium as string)
-    if (utm_term != undefined)
-      localStorage.setItem("utm_term", utm_term as string)
-    if (utm_campaign != undefined)
-      localStorage.setItem("utm_campaign", utm_campaign as string)
-  }, [affiliate, utm_campaign, utm_content, utm_medium, utm_source, utm_term])
 
   if (myFields == undefined) {
     return (
@@ -159,7 +181,7 @@ export default function SignIn({ fields, onSubmit }: DXCUserInteraction) {
   }
 
   return (
-    <>
+    <StyledDiv>
       <Head>
         <title>Sign in</title>
       </Head>
@@ -189,7 +211,6 @@ export default function SignIn({ fields, onSubmit }: DXCUserInteraction) {
           }}
         >
           <Box
-            ref={logoRef}
             style={{
               justifyContent: "center",
               width: "100%",
@@ -197,8 +218,8 @@ export default function SignIn({ fields, onSubmit }: DXCUserInteraction) {
             }}
           >
             <img
-              src="/logos/company-icon.png"
-              alt="To To-Do"
+              src="/company-icon.png"
+              alt="Dexie Starter"
               style={{
                 maxWidth: "30%",
               }}
@@ -212,7 +233,6 @@ export default function SignIn({ fields, onSubmit }: DXCUserInteraction) {
             }}
           >
             {myFields &&
-              // @ts-ignore comment
               Object.entries(myFields).map(
                 ([fieldName, { type, label, placeholder }], idx) => (
                   <Box key={idx}>
@@ -315,7 +335,12 @@ export default function SignIn({ fields, onSubmit }: DXCUserInteraction) {
                       .map((alert, i) => (
                         <Alert
                           severity="error"
-                          sx={{ maxWidth: "300px", margin: "auto", mt: 2 }}
+                          sx={{
+                            maxWidth: "300px",
+                            margin: "auto",
+                            mt: 2,
+                            borderRadius: "10px",
+                          }}
                           key={i}
                         >
                           {resolveText(alert)}
@@ -393,7 +418,7 @@ export default function SignIn({ fields, onSubmit }: DXCUserInteraction) {
           </Box>
         </Box>
       </Box>
-    </>
+    </StyledDiv>
   )
 }
 

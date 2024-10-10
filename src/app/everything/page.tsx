@@ -17,7 +17,7 @@ import AddIcon from "@mui/icons-material/Add"
 import theme from "@/theme"
 import Divider from "@mui/material/Divider"
 import { useObservable } from "dexie-react-hooks"
-import { db } from "./db/db"
+import { db } from "../db/db"
 import { useEffect } from "react"
 import { useRouter } from "next/router"
 
@@ -33,9 +33,7 @@ export default function Everything() {
     { type: "note", content: "Start typing here..." },
     {
       type: "image",
-      content: [
-        "https://www.zenta.se/media/v32l4wzb/activity_rooms_-_shoes.png?upscale=false&width=200&quality=80",
-      ],
+      content: ["https://picsum.photos/200"],
       title: "Product Image",
       price: "$22",
       author: "Mark Twain",
@@ -49,8 +47,7 @@ export default function Everything() {
     },
     {
       type: "image",
-      content:
-        "https://www.zenta.se/media/xsbpxdao/civitas-pod.png?upscale=false&width=200&quality=80",
+      content: "https://unsplash.it/200",
       title: "Real Estate",
       price: "$425,000",
     },
@@ -60,8 +57,7 @@ export default function Everything() {
     },
     {
       type: "image",
-      content:
-        "https://www.zenta.se/media/mfzfopzb/comfy-hero.jpg?upscale=false&width=200&quality=80",
+      content: "https://loremflickr.com/200/200",
       title: "Furniture",
       description: "Eames Lounge Chair",
     },
