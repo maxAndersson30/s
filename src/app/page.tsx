@@ -33,9 +33,6 @@ export default function Home() {
     if (userInteraction !== undefined) setShowLogin(true)
   }, [userInteraction])
 
-  console.log("userInteraction", userInteraction)
-  console.log("dexieCloudUser", dexieCloudUser)
-
   return (
     <>{showLogin && <SignIn {...(userInteraction as DXCUserInteraction)} />}</>
   )

@@ -3,8 +3,9 @@
 import Dexie, { Table } from "dexie"
 import dexieCloud from "dexie-cloud-addon"
 import qs from "qs"
+import { populate } from "../lib/populate"
 
-interface Card {
+export interface ICard {
   id: string
   type: "image" | "note" | "quote" | "checklist"
   content?: string[]
@@ -24,14 +25,13 @@ interface Card {
 }
 
 export class DexieStarter extends Dexie {
-  card!: Table<Card, string>
+  card!: Table<ICard, string>
 
   constructor() {
     super("DexieStarter", { addons: [dexieCloud] })
 
     this.version(1).stores({
-      card: `
-          id, type, *content, title, price, author, description, createdAt, createdBy, updatedAt, updatedBy, isDeleted, deletedAt, deletedBy, realmId, owner`,
+      card: `id, type, *content, title, price, author, description, createdAt, createdBy, updatedAt, updatedBy, isDeleted, deletedAt, deletedBy, realmId, owner`,
       setting_local: "++id, key, value",
     })
   }
@@ -43,7 +43,6 @@ try {
   db = new DexieStarter()
   console.log("Database initialized successfully")
 } catch (error) {
-  error
   console.error("Failed to initialize the database:", error)
 
   // Kontrollera om error är en instans av Error
@@ -100,12 +99,18 @@ const configureDexieCloud = () => {
 // Hantering av första gångens databaspopulation
 const handleFirstTimePopulate = async (initdb: DexieStarter) => {
   try {
+    console.log("POPULATE 1: ", initdb.cloud.currentUserId)
+
     initdb.cloud.events.syncComplete.subscribe(async () => {
+      console.log("POPULATE 2: ", initdb.cloud.currentUserId)
+
       try {
+        console.log("POPULATE 3: ", initdb.cloud.currentUserId)
         if (initdb.cloud.currentUserId !== "unauthorized") {
           const populated = await initdb.card.count()
+          console.log("Database populated count:", populated)
           if (populated === 0) {
-            // await populate()
+            await populate()
             console.log("Database populated for the first time.")
           }
         } else {
