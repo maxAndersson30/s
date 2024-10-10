@@ -7,15 +7,15 @@ const cardItems = [
     id: uuid(),
     type: "text",
     description: `
-        Dexie stands tall, a database so light,  
-        With Dexie Cloud, your data takes flight.  
-        Fast and robust, it scales with ease,  
-        Syncing your apps like a summer breeze.  
-
-        From offline to cloud, no data's lost,  
-        A developer's dream, worth every cost.  
-        Dexie, the hero, we trust with pride,  
-        In Dexie Cloud, our data will ride.
+        <p><b>Dexie</b> stands tall, a database so light,<br /> 
+        With <b>Dexie Cloud</b>, your data takes flight.<br />
+        Fast and robust, it scales with ease,<br />
+        Syncing your apps like a summer breeze.</p>
+        <p></p>
+        <p>From offline to cloud, no data's lost,<br />
+        A developer's dream, worth every cost.<br />
+        <b>Dexie</b>, the hero, we trust with pride,<br />
+        In <b>Dexie Cloud</b>, our data will ride.</p>
     `,
     createdAt: dayjs().subtract(1, "day").toISOString(),
   },
@@ -36,14 +36,14 @@ const cardItems = [
   {
     id: uuid(),
     type: "image",
-    content: "https://unsplash.it/200",
+    content: ["https://unsplash.it/200"],
     description: "Real Estate",
     createdAt: dayjs().subtract(4, "day").toISOString(),
   },
   {
     id: uuid(),
     type: "image",
-    content: "https://loremflickr.com/200/200",
+    content: ["https://loremflickr.com/200/200"],
     description: "Furniture: Eames Lounge Chair",
     createdAt: dayjs().subtract(5, "day").toISOString(),
   },

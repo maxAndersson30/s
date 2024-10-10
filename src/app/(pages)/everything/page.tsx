@@ -10,27 +10,18 @@ import {
   CircularProgress,
   alpha,
 } from "@mui/material"
-import Dialog, { DialogProps } from "@mui/material/Dialog"
-import DialogActions from "@mui/material/DialogActions"
+import Dialog from "@mui/material/Dialog"
 import DialogContent from "@mui/material/DialogContent"
-import DialogContentText from "@mui/material/DialogContentText"
-import DialogTitle from "@mui/material/DialogTitle"
 import theme from "@/theme"
-import {
-  createCard,
-  getCardById,
-  ICard,
-  updateCard,
-  useLiveDataCards,
-} from "../../db/db"
+import { getCardById, ICard, updateCard, useLiveDataCards } from "../../db/db"
 import Tiptap from "@/app/components/tiptap"
 import { useEffect, useState } from "react"
-import Button from "@mui/material/Button"
 import dayjs from "dayjs"
-import { v4 as uuid } from "uuid"
 import Masonry from "react-masonry-css"
 import { useRouter, useSearchParams } from "next/navigation"
 import NewCard from "@/app/components/new-card"
+import { useSearch } from "../SearchContext"
+import ItemCard from "@/app/components/item-card"
 
 export const ContentCard = styled(Card)({
   height: "100%",
@@ -49,6 +40,10 @@ const breakpointColumnsObj = {
 export default function Everything() {
   const router = useRouter()
   const searchParams = useSearchParams() // Hämta query-parametrar
+  const { searchKeyword } = useSearch()
+
+  const cards = useLiveDataCards(searchKeyword)
+
   const [isModalEdit, setIsModalEdit] = useState<string | undefined>(undefined)
 
   const [isEdited, setIsEdited] = useState(false)
@@ -70,8 +65,6 @@ export default function Everything() {
       setIsModalEdit(undefined)
     }
   }, [searchParams])
-
-  const cards = useLiveDataCards()
 
   const closeModal = () => {
     setIsModalEdit(undefined)
@@ -101,44 +94,9 @@ export default function Everything() {
         className="my-masonry-grid"
         columnClassName="my-masonry-grid_column"
       >
-        <div>
-          <NewCard />
-        </div>
+        <NewCard />
         {cards.map((item, index) => (
-          <div key={index}>
-            <ContentCard
-              onClick={() => {
-                router.push(`/everything?edit=${item.id}`)
-              }}
-            >
-              {item?.type === "text" && (
-                <CardContent>
-                  <Typography variant="body1" gutterBottom>
-                    <div
-                      className="editor-content"
-                      dangerouslySetInnerHTML={{
-                        __html: item?.description as string,
-                      }}
-                    />
-                  </Typography>
-                </CardContent>
-              )}
-              {item?.type === "image" && (
-                <>
-                  <CardMedia
-                    component="img"
-                    height="200"
-                    image={item.content as string}
-                  />
-                  <CardContent>
-                    <Typography variant="body1" gutterBottom>
-                      {item?.description}
-                    </Typography>
-                  </CardContent>
-                </>
-              )}
-            </ContentCard>
-          </div>
+          <ItemCard key={item.id} item={item} />
         ))}
       </Masonry>
       <Dialog

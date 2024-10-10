@@ -45,14 +45,19 @@ export const updateCard = async (id: string, content: string) => {
   }
 }
 
-export const useLiveDataCards = (): ICard[] => {
+export const useLiveDataCards = (keyword: string): ICard[] => {
+  console.log("useLiveDataCards", keyword)
   const cards = useLiveQuery(async () => {
     try {
-      return await db.card.toArray()
+      if (!keyword) return await db.card.toArray()
+
+      return (await db.card.toArray()).filter((o) =>
+        o.description?.toLowerCase().trim().includes(keyword)
+      )
     } catch (e) {
       return []
     }
-  }, []) as ICard[]
+  }, [keyword]) as ICard[]
 
   return cards?.sort((a, b) => b.createdAt?.localeCompare(a.createdAt)) || []
 }
