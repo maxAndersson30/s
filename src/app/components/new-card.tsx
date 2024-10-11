@@ -16,6 +16,7 @@ const NewCard = () => {
   const [canPost, setCanPost] = useState(false)
   const [isEditorEmpty, setIsEditorEmpty] = useState(true)
   const [editorContent, setEditorContent] = useState("")
+  const [editor, setEditor] = useState<any>(null) // Ny state för editor-instansen
   const { searchKeyword, setSearchKeyword } = useSearch()
 
   // Funktion som körs när Ctrl+Enter eller Cmd+Enter trycks
@@ -28,11 +29,16 @@ const NewCard = () => {
     } as ICard
 
     createCard(card)
-    setEditorContent("")
     setCanPost(false)
     setIsEdited(false)
     setIsEditorEmpty(true)
     setSearchKeyword("")
+
+    if (editor) {
+      editor.commands.setContent("") // Tömmer innehållet i editorn
+    }
+
+    setEditorContent("")
   }
   return (
     <div>
@@ -63,6 +69,7 @@ const NewCard = () => {
               setIsEditorEmpty={setIsEditorEmpty}
               getContent={setEditorContent}
               onPost={handlePost} // Skicka in handlePost-funktionen
+              setEditor={setEditor} // Skicka in setEditor
             />
             {canPost && (
               <Button

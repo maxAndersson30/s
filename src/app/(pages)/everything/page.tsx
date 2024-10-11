@@ -1,10 +1,15 @@
 "use client"
 
-import { Box, CircularProgress, alpha } from "@mui/material"
+import { Box, CircularProgress, alpha, Chip } from "@mui/material"
 import Dialog from "@mui/material/Dialog"
 import DialogContent from "@mui/material/DialogContent"
 import theme from "@/theme"
-import { getCardById, updateCard, useLiveDataCards } from "../../db/db"
+import {
+  deleteCard,
+  getCardById,
+  updateCard,
+  useLiveDataCards,
+} from "../../db/db"
 import Tiptap from "@/app/components/tiptap"
 import { useEffect, useState } from "react"
 import Masonry from "react-masonry-css"
@@ -12,7 +17,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import NewCard from "@/app/components/new-card"
 import { useSearch } from "../SearchContext"
 import ItemCard from "@/app/components/item-card"
-
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"
 const breakpointColumnsObj = {
   default: 4,
   1100: 3,
@@ -131,7 +136,23 @@ export default function Everything() {
               minWidth: "300px",
               borderRadius: 2,
             }}
-          ></Box>
+          >
+            <Box
+              sx={{
+                display: "flex",
+                gap: 1,
+                padding: 1,
+                backgroundColor: alpha(theme.palette.text.primary, 0.05),
+                borderRadius: "50%",
+              }}
+              onClick={() => {
+                deleteCard(isModalEdit as string)
+                router.push("/everything")
+              }}
+            >
+              <DeleteOutlineIcon />
+            </Box>
+          </Box>
         </DialogContent>
       </Dialog>
     </>

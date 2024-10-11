@@ -45,6 +45,14 @@ export const updateCard = async (id: string, content: string) => {
   }
 }
 
+export const deleteCard = async (id: string) => {
+  try {
+    await db.card.where("id").equals(id).delete()
+  } catch (e) {
+    console.error(e)
+  }
+}
+
 export const useLiveDataCards = (keyword: string): ICard[] => {
   console.log("useLiveDataCards", keyword)
   const cards = useLiveQuery(async () => {

@@ -39,8 +39,7 @@ export const ContentCard = styled("div")<{ isScaled: boolean }>(
 export const ContentWrapper = styled("div")<{ scaleFactor: number }>(
   ({ scaleFactor }) => ({
     zoom: scaleFactor < 1 ? "0.5" : "1", // Justera skalning
-    transformOrigin: "top left",
-    transition: "transform 0.3s",
+    transition: "zoom 0.3s",
     width: "100%",
     overflowX: "hidden",
   })
@@ -89,14 +88,12 @@ const ItemCard: React.FC<ItemCardProps> = ({ item }) => {
         <div ref={contentRef}>
           {item.type === "text" && (
             <CardContent>
-              <Typography variant="body1" gutterBottom>
-                <div
-                  className="editor-content"
-                  dangerouslySetInnerHTML={{
-                    __html: item?.description || "",
-                  }}
-                />
-              </Typography>
+              <div
+                className="editor-content"
+                dangerouslySetInnerHTML={{
+                  __html: item?.description || "",
+                }}
+              />
             </CardContent>
           )}
           {item.type === "image" && item.content && (
@@ -108,18 +105,14 @@ const ItemCard: React.FC<ItemCardProps> = ({ item }) => {
                 sx={{
                   height: "200px",
                   objectFit: "cover", // Säkerställ att bilden täcker området
+                  borderRadius: "6px 6px 0 0", // Runda hörnen på toppen
                 }}
               />
-              <CardContent>
-                <Typography variant="body1" gutterBottom>
-                  {item.description}
-                </Typography>
-              </CardContent>
+              <CardContent>{item.description}</CardContent>
             </>
           )}
         </div>
       </ContentWrapper>
-      {/* Lägg till en gradient för att indikera att innehåll döljs */}
       {isScaled && (
         <div
           style={{

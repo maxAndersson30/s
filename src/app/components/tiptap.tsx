@@ -3,7 +3,7 @@
 import { useEditor, EditorContent } from "@tiptap/react"
 import Placeholder from "@tiptap/extension-placeholder"
 import StarterKit from "@tiptap/starter-kit"
-import { CSSProperties, useRef } from "react"
+import { CSSProperties, useEffect, useRef } from "react"
 
 interface EditorProps {
   content?: string
@@ -13,6 +13,7 @@ interface EditorProps {
   setIsEditorEmpty: (isEmpty: boolean) => void
   getContent: (content: string) => void
   onPost: (content: string) => void // Ny funktion som triggas vid post
+  setEditor: (editor: any) => void // Ny prop för att skicka ut editor-instansen
 }
 
 const Tiptap = ({
@@ -23,6 +24,7 @@ const Tiptap = ({
   setIsEditorEmpty,
   getContent,
   onPost,
+  setEditor, // Mottag setEditor-funktionen
 }: EditorProps) => {
   const initialContent = useRef(content)
 
@@ -68,6 +70,12 @@ const Tiptap = ({
       }
     },
   })
+
+  useEffect(() => {
+    if (editor) {
+      if (setEditor) setEditor(editor)
+    }
+  }, [editor, setEditor])
 
   return <EditorContent editor={editor} style={style} />
 }

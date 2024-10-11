@@ -6,16 +6,14 @@ import {
   Typography,
   TextField,
   Container,
-  IconButton,
   Box,
 } from "@mui/material"
-import AddIcon from "@mui/icons-material/Add"
 import theme from "@/theme"
 import Divider from "@mui/material/Box"
 import { useObservable } from "dexie-react-hooks"
 import { useRouter } from "next/navigation"
-
-import { ReactNode, useEffect, useState } from "react"
+import HistoryIcon from "@mui/icons-material/History"
+import { ReactNode, useEffect } from "react"
 import { db } from "../db/db"
 import React from "react"
 import { SearchProvider, useSearch } from "./SearchContext"
@@ -58,8 +56,9 @@ export default function Template({ children }: { children: ReactNode }) {
               variant="body1"
               sx={{
                 mx: 2,
-                borderTop: `solid 4px ${theme.palette.primary.main}`,
                 pt: 1,
+                borderTop: `solid 4px ${theme.palette.primary.main}`,
+                fontSize: "1.2rem", // Större textstorlek vid aktivt val
               }}
               color="primary"
             >
@@ -82,9 +81,22 @@ export default function Template({ children }: { children: ReactNode }) {
                 borderTop: `solid 4px transparent`,
                 pt: 1,
               }}
-              onClick={() => db.card.clear()}
             >
               Serendipity
+            </Typography>
+
+            <Typography
+              variant="body1"
+              sx={{
+                mx: 2,
+                borderTop: `solid 4px transparent`,
+                pt: 1,
+              }}
+              onClick={() => {
+                confirm("Reset all stored data?") && db.card.clear()
+              }}
+            >
+              <HistoryIcon />
             </Typography>
           </Toolbar>
         </AppBar>
