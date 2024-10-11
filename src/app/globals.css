@@ -47,6 +47,17 @@ h1 {
   unicode-bidi: isolate;
 }
 
+ul, ol {
+  padding-left: 20px; /* Justera efter behov */
+  margin-left: 0;
+}
+
+li {
+  margin-left: 0;
+  padding-left: 0;
+}
+
+
 .tiptap p.is-editor-empty:first-child::before {
   color: #adb5bd;
   content: attr(data-placeholder);
