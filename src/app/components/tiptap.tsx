@@ -4,6 +4,8 @@ import { useEditor, EditorContent } from "@tiptap/react"
 import Placeholder from "@tiptap/extension-placeholder"
 import StarterKit from "@tiptap/starter-kit"
 import { CSSProperties, useEffect, useRef } from "react"
+import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight"
+import { common, createLowlight } from "lowlight"
 
 interface EditorProps {
   content?: string
@@ -31,6 +33,10 @@ const Tiptap = ({
   const editor = useEditor({
     extensions: [
       StarterKit,
+      CodeBlockLowlight.configure({
+        lowlight: createLowlight(common),
+        defaultLanguage: null,
+      }),
       Placeholder.configure({
         placeholder: "Write something …",
       }),
