@@ -5,11 +5,14 @@ import dexieCloud from "dexie-cloud-addon"
 import qs from "qs"
 import { populate } from "../lib/populate"
 import { useLiveQuery } from "dexie-react-hooks"
+import * as Y from 'yjs';
+import * as awarenessProtocol from 'y-protocols/awareness';
 
 export interface ICard {
   id: string
   type: "image" | "text"
   createdAt: string
+  doc: Y.Doc
   content?: string[]
   description?: string
   realmId?: string
@@ -20,10 +23,13 @@ export class DexieStarter extends Dexie {
   card!: Table<ICard, string>
 
   constructor() {
-    super("DexieStarter", { addons: [dexieCloud] })
+    super("DexieStarter", {
+      Y,
+      addons: [dexieCloud]
+    })
 
     this.version(1).stores({
-      card: `id, type, *content, description, createdAt, realmId, owner`,
+      card: `id, type, *content, description, createdAt, realmId, owner, doc:Y`,
       setting_local: "++id, key, value",
     })
   }
@@ -96,6 +102,7 @@ const query =
 const configureDexieCloud = () => {
   try {
     db.cloud.configure({
+      awarenessProtocol, // Enable Y.js awareness
       databaseUrl:
         process.env.NEXT_PUBLIC_DEXIE_CLOUD_DB_URL ||
         "https://your-dexie-db.dexie.cloud",
