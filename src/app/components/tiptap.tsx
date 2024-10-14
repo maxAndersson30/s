@@ -51,7 +51,7 @@ const Tiptap = ({
             onPost(editor.getHTML())
           }
 
-          editor.commands.setContent("")
+          editor?.commands.setContent("")
 
           event.preventDefault() // Förhindra standardbeteendet
           return true
