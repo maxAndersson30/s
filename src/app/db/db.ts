@@ -25,7 +25,7 @@ export class DexieStarter extends Dexie {
   constructor() {
     super("DexieStarter", {
       Y,
-      gc: false,
+      //gc: false,
       addons: [dexieCloud]
     })
 
