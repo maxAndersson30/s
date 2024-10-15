@@ -10,7 +10,7 @@ import * as awarenessProtocol from 'y-protocols/awareness';
 
 export interface ICard {
   id: string
-  type: "image" | "text"
+  type: "image" | "text" | "document"
   createdAt: string
   doc: Y.Doc
   content?: string[]
@@ -25,6 +25,7 @@ export class DexieStarter extends Dexie {
   constructor() {
     super("DexieStarter", {
       Y,
+      gc: false,
       addons: [dexieCloud]
     })
 

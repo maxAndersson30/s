@@ -5,19 +5,23 @@ import Dialog from "@mui/material/Dialog"
 import DialogContent from "@mui/material/DialogContent"
 import theme from "@/theme"
 import {
+  db,
   deleteCard,
   getCardById,
   updateCard,
   useLiveDataCards,
 } from "../../db/db"
 import Tiptap from "@/app/components/tiptap"
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import Masonry from "react-masonry-css"
 import { useRouter, useSearchParams } from "next/navigation"
 import NewCard from "@/app/components/new-card"
 import { useSearch } from "../SearchContext"
 import ItemCard from "@/app/components/item-card"
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"
+import * as Y from "yjs"
+import { useDocument, useLiveQuery } from "dexie-react-hooks"
+
 const breakpointColumnsObj = {
   default: 4,
   1100: 3,
@@ -37,21 +41,15 @@ export default function Everything() {
   const [isEdited, setIsEdited] = useState(false)
   const [canPost, setCanPost] = useState(false)
   const [isEditorEmpty, setIsEditorEmpty] = useState(true)
-  const [editorContent, setEditorContent] = useState("")
+  //const [editorContent, setEditorContent] = useState("")
+  const rowBeingEdited = useLiveQuery(() => isModalEdit
+    ? db.card.where("id").equals(isModalEdit).first():
+    undefined, [isModalEdit])
+  useDocument(rowBeingEdited?.doc)
 
   useEffect(() => {
-    async function getEditorContent(id: string) {
-      const card = await getCardById(id)
-      setEditorContent(card?.description as string)
-      setIsModalEdit(id)
-    }
     const modalParam = searchParams.get("edit")
-
-    if (modalParam != undefined) {
-      getEditorContent(modalParam)
-    } else {
-      setIsModalEdit(undefined)
-    }
+    setIsModalEdit(modalParam || undefined)
   }, [searchParams])
 
   const closeModal = () => {
@@ -64,7 +62,7 @@ export default function Everything() {
     if (!isModalEdit) return
 
     updateCard(isModalEdit, content)
-    setEditorContent("")
+    //setEditorContent("")
     setCanPost(false)
     setIsEdited(false)
     setIsEditorEmpty(true)
@@ -90,7 +88,7 @@ export default function Everything() {
       <Dialog
         fullWidth={true}
         maxWidth="lg"
-        open={isModalEdit != undefined}
+        open={isModalEdit != undefined && rowBeingEdited != null}
         onClose={closeModal}
         PaperProps={{
           style: {
@@ -116,11 +114,12 @@ export default function Everything() {
             }}
           >
             <Tiptap
-              content={editorContent}
+              yDoc={rowBeingEdited?.doc || new Y.Doc()}
+              setEditor={()=>{}}
               setIsEdited={setIsEdited}
               setCanPost={setCanPost}
               setIsEditorEmpty={setIsEditorEmpty}
-              getContent={setEditorContent}
+              getContent={()=>{}}
               onPost={handlePost}
               style={{
                 minWidth: "810px",

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { use, useState } from "react"
 import { v4 as uuid } from "uuid"
 import { createCard, ICard } from "../db/db"
 import dayjs from "dayjs"
@@ -10,6 +10,7 @@ import Button from "@mui/material/Button"
 import { Typography, CardContent } from "@mui/material"
 import { useSearch } from "../(pages)/SearchContext"
 import { ContentCard, ContentWrapper } from "./item-card"
+import * as Y from "yjs"
 
 const NewCard = () => {
   const [isEdited, setIsEdited] = useState(false)
@@ -18,13 +19,14 @@ const NewCard = () => {
   const [editorContent, setEditorContent] = useState("")
   const [editor, setEditor] = useState<any>(null) // Ny state för editor-instansen
   const { searchKeyword, setSearchKeyword } = useSearch()
+  const tempDoc = useState(()=>new Y.Doc())[0];
 
   // Funktion som körs när Ctrl+Enter eller Cmd+Enter trycks
-  const handlePost = (content: string) => {
+  const handlePost = (yDoc: Y.Doc) => {
     const card = {
       id: uuid(),
-      type: "text",
-      description: content,
+      type: "document",
+      doc: yDoc,
       createdAt: dayjs().toISOString(),
     } as ICard
 
@@ -63,19 +65,19 @@ const NewCard = () => {
             </Typography>
 
             <Tiptap
-              content=""
+              yDoc={tempDoc}
               setIsEdited={setIsEdited}
               setCanPost={setCanPost}
               setIsEditorEmpty={setIsEditorEmpty}
               getContent={setEditorContent}
-              onPost={handlePost} // Skicka in handlePost-funktionen
+              onPost={()=>handlePost(tempDoc)} // Skicka in handlePost-funktionen
               setEditor={setEditor} // Skicka in setEditor
             />
             {canPost && (
               <Button
                 variant="contained"
                 color="primary"
-                onClick={() => handlePost(editorContent)}
+                onClick={() => handlePost(tempDoc)}
                 disabled={!canPost}
                 sx={{
                   position: "absolute",
