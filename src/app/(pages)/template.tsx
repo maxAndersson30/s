@@ -18,6 +18,7 @@ import { db } from "../db/db"
 import React from "react"
 import { SearchProvider, useSearch } from "./SearchContext"
 
+// TODO: Seems this component is not used in the project. Can we remove it or is it planned to be used?
 export default function Template({ children }: { children: ReactNode }) {
   const router = useRouter()
 

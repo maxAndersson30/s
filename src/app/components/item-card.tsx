@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation"
 import { CardContent, Typography, CardMedia } from "@mui/material"
 import { styled } from "@mui/material/styles"
 import { ICard } from "../db/db"
-import { useDocToHtml } from "../lib/useDocToHtml"
 
 // Definiera höjdgränser
 const HEIGHT_THRESHOLD = 500 // px - Innehållshöjd för skalning
@@ -55,8 +54,6 @@ const ItemCard: React.FC<ItemCardProps> = ({ item }) => {
   const contentRef = useRef<HTMLDivElement>(null)
   const [isScaled, setIsScaled] = useState(false)
   const [scaleFactor, setScaleFactor] = useState(1)
-  const itemDoc = item.doc;
-  const docHtml = useDocToHtml(item.doc);
 
   /*useEffect(() => {
     console.log("ItemCard rendered", scaleFactor)
@@ -89,22 +86,12 @@ const ItemCard: React.FC<ItemCardProps> = ({ item }) => {
     >
       <ContentWrapper scaleFactor={scaleFactor}>
         <div ref={contentRef}>
-          {item.type === "document" && (
-            <CardContent>
-            <div
-              className="editor-content"
-              dangerouslySetInnerHTML={{
-                __html: docHtml,
-              }}
-            />
-          </CardContent>
-        )}
-          {item.type === "text" && (
+          {(item.type === "text" || item.type === "document") && (
             <CardContent>
               <div
                 className="editor-content"
                 dangerouslySetInnerHTML={{
-                  __html: item?.description || "",
+                  __html: item?.docHtml || "",
                 }}
               />
             </CardContent>

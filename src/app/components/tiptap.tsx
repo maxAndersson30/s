@@ -1,5 +1,4 @@
 "use client"
-
 import { useEditor, EditorContent, Extensions } from "@tiptap/react"
 import Placeholder from "@tiptap/extension-placeholder"
 import StarterKit from "@tiptap/starter-kit"
@@ -12,10 +11,11 @@ import * as Y from "yjs"
 import { useDocument, useObservable } from "dexie-react-hooks"
 import { db } from "../db/db"
 import { DexieYProvider } from "dexie"
+import { commonTiptapExtensions } from "../lib/common-tiptap-extensions"
 
 interface EditorProps {
   yDoc?: Y.Doc
-  provider?: DexieYProvider
+  provider?: DexieYProvider | null
   style?: CSSProperties
   setIsEdited: (edited: boolean) => void
   setCanPost: (canPost: boolean) => void
@@ -43,11 +43,7 @@ const Tiptap = ({
   );
 
   const extensions: Extensions = [
-    StarterKit,
-    CodeBlockLowlight.configure({
-      lowlight: createLowlight(common),
-      defaultLanguage: null,
-    }),
+    ...commonTiptapExtensions,
     Placeholder.configure({
       placeholder: "Write something …",
     }),
@@ -57,12 +53,12 @@ const Tiptap = ({
   ];
   if (provider) {
     extensions.push(
-    CollaborationCursor.configure({
-      provider,
-      user: {
-        name: currentUser?.name || 'Anonymous',
-        color: collaborationColor,
-      },
+      CollaborationCursor.configure({
+        provider,
+        user: {
+          name: currentUser?.name || 'Anonymous',
+          color: collaborationColor,
+        },
     }));
   }
 

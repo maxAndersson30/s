@@ -45,7 +45,7 @@ export default function Everything() {
   const rowBeingEdited = useLiveQuery(() => isModalEdit
     ? db.card.where("id").equals(isModalEdit).first():
     undefined, [isModalEdit])
-  useDocument(rowBeingEdited?.doc)
+  const provider = useDocument(rowBeingEdited?.doc)
 
   useEffect(() => {
     const modalParam = searchParams.get("edit")
@@ -115,6 +115,7 @@ export default function Everything() {
           >
             <Tiptap
               yDoc={rowBeingEdited?.doc || new Y.Doc()}
+              provider={provider}
               setEditor={()=>{}}
               setIsEdited={setIsEdited}
               setCanPost={setCanPost}
