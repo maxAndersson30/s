@@ -1,14 +1,21 @@
 "use client"
-
-import { useEditor, EditorContent } from "@tiptap/react"
+import { useEditor, EditorContent, Extensions } from "@tiptap/react"
 import Placeholder from "@tiptap/extension-placeholder"
 import StarterKit from "@tiptap/starter-kit"
-import { CSSProperties, useEffect, useRef } from "react"
+import { CSSProperties, useEffect, useMemo, useRef } from "react"
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight"
 import { common, createLowlight } from "lowlight"
+import Collaboration from "@tiptap/extension-collaboration";
+import CollaborationCursor from '@tiptap/extension-collaboration-cursor';
+import * as Y from "yjs"
+import { useDocument, useObservable } from "dexie-react-hooks"
+import { db } from "../db/db"
+import { DexieYProvider } from "dexie"
+import { commonTiptapExtensions } from "../lib/common-tiptap-extensions"
 
 interface EditorProps {
-  content?: string
+  yDoc?: Y.Doc
+  provider?: DexieYProvider | null
   style?: CSSProperties
   setIsEdited: (edited: boolean) => void
   setCanPost: (canPost: boolean) => void
@@ -19,7 +26,8 @@ interface EditorProps {
 }
 
 const Tiptap = ({
-  content = "",
+  yDoc,
+  provider,
   style,
   setIsEdited,
   setCanPost,
@@ -28,20 +36,34 @@ const Tiptap = ({
   onPost,
   setEditor, // Mottag setEditor-funktionen
 }: EditorProps) => {
-  const initialContent = useRef(content)
+  const currentUser = useObservable(db.cloud.currentUser);
+  const collaborationColor = useMemo(
+    () => randomCollaborationColor(currentUser?.userId),
+    [currentUser?.userId]
+  );
+
+  const extensions: Extensions = [
+    ...commonTiptapExtensions,
+    Placeholder.configure({
+      placeholder: "Write something …",
+    }),
+    Collaboration.configure({
+      document: yDoc,
+    })
+  ];
+  if (provider) {
+    extensions.push(
+      CollaborationCursor.configure({
+        provider,
+        user: {
+          name: currentUser?.name || 'Anonymous',
+          color: collaborationColor,
+        },
+    }));
+  }
 
   const editor = useEditor({
-    extensions: [
-      StarterKit,
-      CodeBlockLowlight.configure({
-        lowlight: createLowlight(common),
-        defaultLanguage: null,
-      }),
-      Placeholder.configure({
-        placeholder: "Write something …",
-      }),
-    ],
-    content: content,
+    extensions,
     editorProps: {
       handleKeyDown(view: any, event: any) {
         // Kolla om Cmd+Enter eller Ctrl+Enter har tryckts
@@ -66,7 +88,7 @@ const Tiptap = ({
 
         // Jämför nuvarande innehåll med initialContent
         const currentContent = editor.getHTML()
-        const isModified = currentContent !== initialContent.current
+        const isModified = true;//currentContent !== initialContent.current
 
         setIsEdited(isModified)
         setCanPost(!isEditorEmpty && isModified)
@@ -87,3 +109,17 @@ const Tiptap = ({
 }
 
 export default Tiptap
+
+
+function randomCollaborationColor(userId: string | undefined) {
+  const colors = ['#FF5733', '#33FF57', '#3357FF', '#F333FF'];
+  if (userId) {
+    return colors[
+      (userId.charCodeAt(0) +
+        (userId.charCodeAt(3) || 0) +
+        (userId.charCodeAt(5) || 0)) %
+        colors.length
+    ];
+  }
+  return colors[0];
+}

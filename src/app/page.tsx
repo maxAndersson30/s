@@ -14,7 +14,7 @@ export default function Home() {
       console.error(err)
     })
 
-    populate()
+    populate().catch(error => console.error(`Error when populating ${error}`));
   }
 
   const router = useRouter()

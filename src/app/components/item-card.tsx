@@ -55,9 +55,9 @@ const ItemCard: React.FC<ItemCardProps> = ({ item }) => {
   const [isScaled, setIsScaled] = useState(false)
   const [scaleFactor, setScaleFactor] = useState(1)
 
-  useEffect(() => {
+  /*useEffect(() => {
     console.log("ItemCard rendered", scaleFactor)
-  }, [scaleFactor])
+  }, [scaleFactor])*/
 
   const handleClick = () => {
     router.push(`/everything?edit=${item.id}`)
@@ -86,12 +86,12 @@ const ItemCard: React.FC<ItemCardProps> = ({ item }) => {
     >
       <ContentWrapper scaleFactor={scaleFactor}>
         <div ref={contentRef}>
-          {item.type === "text" && (
+          {(item.type === "text" || item.type === "document") && (
             <CardContent>
               <div
                 className="editor-content"
                 dangerouslySetInnerHTML={{
-                  __html: item?.description || "",
+                  __html: item?.docHtml || "",
                 }}
               />
             </CardContent>

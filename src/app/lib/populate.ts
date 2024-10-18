@@ -1,6 +1,8 @@
-import dayjs from "dayjs"
-import { ICard, db } from "../db/db"
-import { v4 as uuid } from "uuid"
+import dayjs from "dayjs";
+import { ICard, db } from "../db/db";
+import { v4 as uuid } from "uuid";
+import { docToHtml, htmlToDoc } from "./docToHtml";
+import * as Y from "yjs";
 
 const cardItems = [
   {
@@ -47,21 +49,27 @@ const cardItems = [
     description: "Furniture: Eames Lounge Chair",
     createdAt: dayjs().subtract(5, "day").toISOString(),
   },
-] as ICard[]
+] as ICard[];
 
 export async function populate() {
   if ((await db.card.count()) === 0) {
-    console.log("Populating the database with initial data")
-    db.transaction("rw", db.card as any, () => {
-      db.card
-        .clear()
-        .then(async () => {
-          await db.card.bulkAdd(cardItems as any)
-        })
-        .then(() => {})
-        .catch((err) => {
-          console.error(err)
-        })
-    })
+    console.log("Populating the database with initial data");
+    await db.transaction("rw", db.card as any, async () => {
+      if ((await db.card.count()) > 0) return;
+      await db.card.clear();
+      const cardsToInsert = cardItems.map((cardItem) => {
+        const cardToInsert: ICard = { ...cardItem };
+        if (cardItem.description) {
+          // Convert description HTML to Y.Doc before inserting to DB:
+          cardToInsert.doc = htmlToDoc(cardItem.description);
+          const stateVector = Y.encodeStateVector(cardToInsert.doc);
+          //cardToInsert.docHtml = cardItem.description;
+          //const backHtml = docToHtml(cardToInsert.doc);
+          delete cardToInsert.description;
+        }
+        return cardToInsert;
+      });
+      await db.card.bulkAdd(cardsToInsert);
+    });
   }
 }
