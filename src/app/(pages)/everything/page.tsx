@@ -43,7 +43,7 @@ export default function Everything() {
   const [isEditorEmpty, setIsEditorEmpty] = useState(true)
   //const [editorContent, setEditorContent] = useState("")
   const rowBeingEdited = useLiveQuery(() => isModalEdit
-    ? db.card.where("id").equals(isModalEdit).first():
+    ? db.card.where("id").equals(isModalEdit).first() :
     undefined, [isModalEdit])
   const provider = useDocument(rowBeingEdited?.doc)
 
@@ -69,7 +69,7 @@ export default function Everything() {
     router.push("/everything")
   }
 
-  if (!cards || cards.length === 0) {
+  if (!cards) {
     return <CircularProgress />
   }
 
@@ -116,11 +116,11 @@ export default function Everything() {
             <Tiptap
               yDoc={rowBeingEdited?.doc || new Y.Doc()}
               provider={provider}
-              setEditor={()=>{}}
+              setEditor={() => { }}
               setIsEdited={setIsEdited}
               setCanPost={setCanPost}
               setIsEditorEmpty={setIsEditorEmpty}
-              getContent={()=>{}}
+              getContent={() => { }}
               onPost={handlePost}
               style={{
                 minWidth: "810px",
