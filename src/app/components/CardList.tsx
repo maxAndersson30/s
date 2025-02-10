@@ -31,7 +31,6 @@ import {
   shareSpaceList,
   unshareSpaceList,
   updateCardTitle,
-  useLiveAllMembers,
   useLiveDataCards,
   useLiveDataSpaces,
   useLiveSpaceMembers,
@@ -83,7 +82,7 @@ export default function CardList({
     null,
   )
   const members = useLiveSpaceMembers(space)
-  const allMembers = useLiveAllMembers()
+  const allMembers = useLiveQuery(() => db.members.toArray())
 
   const dexieCloudUser = useObservable(db.cloud.currentUser) || {
     userId: 'unauthorized',

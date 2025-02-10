@@ -9,7 +9,7 @@ import dexieCloud, {
 import { useLiveQuery } from 'dexie-react-hooks'
 import * as Y from 'yjs'
 import * as awarenessProtocol from 'y-protocols/awareness'
-import { docToHtml, htmlToDoc } from '../lib/docToHtml'
+import { docToHtml } from '../lib/docToHtml'
 import { extractLunrKeywords } from './fullTextSearch'
 import { query } from '../lib/query'
 import { prepopulatedItems } from '../lib/prepopulatedItems'
@@ -26,7 +26,6 @@ export interface ICard {
   doc: Y.Doc
   docHtml?: string
   fullTextIndex: string[]
-  description?: string
   realmId?: string
   owner?: string
   spaceId?: string
@@ -120,11 +119,6 @@ export class DexieStarter extends Dexie {
           await vipDB.cards.clear()
           const cardsToInsert = prepopulatedItems.map((cardItem) => {
             const cardToInsert: ICard = { ...cardItem }
-            if (cardItem.description) {
-              // Convert description HTML to Y.Doc before inserting to DB:
-              cardToInsert.doc = htmlToDoc(cardItem.description)
-              delete cardToInsert.description
-            }
             return cardToInsert
           })
           await vipDB.cards.bulkAdd(cardsToInsert)
@@ -242,14 +236,6 @@ export const useLiveSpaceMembers = (space?: ISpaceList): DBRealmMember[] => {
 
     return returnMembers
   }, [space?.realmId]) as DBRealmMember[]
-
-  return members
-}
-
-export const useLiveAllMembers = (): DBRealmMember[] => {
-  const members = useLiveQuery(() => {
-    return db.members.toArray()
-  }, []) as DBRealmMember[]
 
   return members
 }
