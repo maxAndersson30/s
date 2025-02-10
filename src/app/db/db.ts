@@ -70,7 +70,6 @@ export class DexieStarter extends Dexie {
     // A trigger to set the docHtml string attribute from Y.Doc content
     defineYDocTrigger(this.cards, 'doc', async (ydoc, parentId) => {
       const html = docToHtml(ydoc as Y.Doc)
-      const update = Y.encodeStateAsUpdateV2(ydoc as Y.Doc)
       await this.cards.update(parentId, {
         docHtml: html,
         fullTextIndex: extractLunrKeywords(html),
@@ -91,7 +90,7 @@ export class DexieStarter extends Dexie {
           'docHtml', // docHtml is a locally computed HTML version of doc
           'fullTextIndex', // fullTextIndex is the searchable lunr words extracted from docHtml
         ] satisfies (keyof ICard)[], // ('satisfies' gives us stricter typings for the property names in the list)
-      } satisfies { [TableName in keyof DexieStarter]?: any[] }, // 'satisfies' detects renames of tables
+      } satisfies { [TableName in keyof DexieStarter]?: string[] }, // 'satisfies' detects renames of tables
 
       // Enable Y.js awareness
       awarenessProtocol: awarenessProtocol,
