@@ -86,7 +86,14 @@ const ItemCard: React.FC<ItemCardProps> = ({ item }) => {
         </Box>
       )}
       <ContentWrapper scaleFactor={scaleFactor}>
-        <CardContent>
+        <CardContent
+          sx={{
+            '& img': {
+              maxWidth: '100%',
+              height: 'auto',
+            },
+          }}
+        >
           <div
             ref={contentRef}
             className="editor-content"
