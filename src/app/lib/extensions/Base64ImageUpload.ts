@@ -61,31 +61,64 @@ export const Base64ImageUpload = Extension.create({
         props: {
           handleDOMEvents: {
             paste: (view, event: ClipboardEvent) => {
-              if (!event.clipboardData?.files?.length) return false
-              const files = event.clipboardData.files
+              const clipboardData = event.clipboardData
+              if (!clipboardData) return false
 
-              event.preventDefault()
-              for (let i = 0; i < files.length; i++) {
-                const file = files[i]
-                if (!file.type.startsWith('image/')) return
-                const reader = new FileReader()
-                reader.onload = (readerEvent) => {
-                  const result = readerEvent.target?.result
-                  if (typeof result === 'string') {
-                    downscaleImage(result, 1024, 1024, 0.6)
-                      .then((resizedResult) => {
-                        const { state, dispatch } = view
-                        const imageNode = state.schema.nodes.image.create({
-                          src: resizedResult,
+              // Försök först att använda clipboardData.files
+              if (clipboardData.files && clipboardData.files.length > 0) {
+                event.preventDefault()
+                for (let i = 0; i < clipboardData.files.length; i++) {
+                  const file = clipboardData.files[i]
+                  if (!file.type.startsWith('image/')) continue
+                  const reader = new FileReader()
+                  reader.onload = (readerEvent) => {
+                    const result = readerEvent.target?.result
+                    if (typeof result === 'string') {
+                      downscaleImage(result, 1024, 1024, 0.6)
+                        .then((resizedResult) => {
+                          const { state, dispatch } = view
+                          const imageNode = state.schema.nodes.image.create({
+                            src: resizedResult,
+                          })
+                          dispatch(state.tr.replaceSelectionWith(imageNode))
                         })
-                        dispatch(state.tr.replaceSelectionWith(imageNode))
-                      })
-                      .catch((error) => console.error(error))
+                        .catch((error) => console.error(error))
+                    }
+                  }
+                  reader.readAsDataURL(file)
+                }
+                return true
+              }
+
+              // Om inga filer hittas, kolla clipboardData.items
+              if (clipboardData.items && clipboardData.items.length > 0) {
+                event.preventDefault()
+                for (let i = 0; i < clipboardData.items.length; i++) {
+                  const item = clipboardData.items[i]
+                  if (!item.type.startsWith('image/')) continue
+                  const file = item.getAsFile()
+                  if (file) {
+                    const reader = new FileReader()
+                    reader.onload = (readerEvent) => {
+                      const result = readerEvent.target?.result
+                      if (typeof result === 'string') {
+                        downscaleImage(result, 1024, 1024, 0.6)
+                          .then((resizedResult) => {
+                            const { state, dispatch } = view
+                            const imageNode = state.schema.nodes.image.create({
+                              src: resizedResult,
+                            })
+                            dispatch(state.tr.replaceSelectionWith(imageNode))
+                          })
+                          .catch((error) => console.error(error))
+                      }
+                    }
+                    reader.readAsDataURL(file)
                   }
                 }
-                reader.readAsDataURL(file)
+                return true
               }
-              return true
+              return false
             },
             drop: (view, event: DragEvent) => {
               const files = event.dataTransfer?.files
