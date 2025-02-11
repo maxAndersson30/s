@@ -16,7 +16,9 @@ export const commonTiptapExtensions = [
     lowlight: createLowlight(common),
     defaultLanguage: null,
   }),
-  ImageResize.configure({}),
+  ImageResize.configure({
+    allowBase64: true,
+  }),
   Base64ImageUpload,
 ]
 Object.freeze(commonTiptapExtensions)
