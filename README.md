@@ -2,7 +2,24 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-First, run the development server:
+First, create a database in Dexie Cloud
+
+```
+npx dexie-cloud create [--hackathon]
+```
+
+Then, whitelist the origin used to access the app
+```
+npx dexie-cloud whitelist http://localhost:3000
+```
+
+Then, create an .env file with the variable 
+
+```
+NEXT_PUBLIC_DEXIE_CLOUD_DB_URL=https://yourdb.dexie.cloud
+```
+
+Then, run the development server:
 
 ```bash
 npm run dev
