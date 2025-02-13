@@ -8,6 +8,8 @@ First, create a database in Dexie Cloud
 npx dexie-cloud create [--hackathon]
 ```
 
+Note the DB url.
+
 Then, whitelist the origin used to access the app
 ```
 npx dexie-cloud whitelist http://localhost:3000
@@ -16,7 +18,7 @@ npx dexie-cloud whitelist http://localhost:3000
 Then, create an .env file with the variable 
 
 ```
-NEXT_PUBLIC_DEXIE_CLOUD_DB_URL=https://<your db>.dexie.cloud
+NEXT_PUBLIC_DEXIE_CLOUD_DB_URL=https://<DB url>.dexie.cloud
 ```
 
 Then, run the development server:
