@@ -16,7 +16,7 @@ npx dexie-cloud whitelist http://localhost:3000
 Then, create an .env file with the variable 
 
 ```
-NEXT_PUBLIC_DEXIE_CLOUD_DB_URL=https://yourdb.dexie.cloud
+NEXT_PUBLIC_DEXIE_CLOUD_DB_URL=https://<your db>.dexie.cloud
 ```
 
 Then, run the development server:
