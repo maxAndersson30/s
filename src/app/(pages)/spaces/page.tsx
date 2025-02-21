@@ -21,6 +21,8 @@ import ItemCard, { FIXED_HEIGHT } from '@/app/components/ItemCard'
 import theme from '@/theme'
 import Link from 'next/link'
 import Avatars from '@/app/components/Avatars'
+import MyDropzone from '@/app/components/FileUpload'
+
 export default function Spaces() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [newSpaceName, setNewSpaceName] = useState('')
@@ -50,6 +52,7 @@ export default function Spaces() {
         }}
       >
         <Typography variant="h5">All spaces</Typography>
+        <MyDropzone />
         <Chip
           icon={<WorkspacesIcon />}
           label="New space"
