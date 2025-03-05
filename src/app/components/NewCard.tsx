@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react'
 import { v4 as uuid } from 'uuid'
-import { createCard, ICard } from '../db/db'
+import { createCard, addImageToCard, getImagesByCardId } from '../db/db'
 import dayjs from 'dayjs'
 import Tiptap from '@/app/components/tiptap'
 import theme from '@/theme'
@@ -12,6 +12,7 @@ import { useSearch } from '../(pages)/SearchContext'
 import { ContentCard, ContentWrapper } from './ItemCard'
 import * as Y from 'yjs'
 import { Editor } from '@tiptap/react'
+import Dropzone from 'react-dropzone'
 
 interface NewCardProps {
   spaceId?: string
@@ -19,39 +20,57 @@ interface NewCardProps {
 
 const NewCard = ({ spaceId }: NewCardProps) => {
   const [canPost, setCanPost] = useState(false)
-
   const { setSearchKeyword } = useSearch()
-  const [tempDoc, setTempDoc] = useState(() => new Y.Doc())
   const editorRef = useRef<Editor | null>(null)
+  const [cardId, setCardId] = useState<string | null>(null)
+  const [tempDoc] = useState(() => new Y.Doc())
+  const [acceptedFiles, setAcceptedFiles] = useState<File[]>([])
 
-  const handlePost = async (yDoc: Y.Doc) => {
-    // Reset the state and clear content by assigning a new empty doc
-    setTempDoc(new Y.Doc())
-    setCanPost(false)
+  const handlePost = async () => {
+    let currentCardId = cardId
+    if (!currentCardId) {
+      currentCardId = uuid()
+      setCardId(currentCardId)
+
+      try {
+        await createCard({
+          id: currentCardId,
+          createdAt: dayjs().toISOString(),
+          title: 'New Card',
+          doc: tempDoc,
+          spaceId,
+          fullTextIndex: [],
+        })
+        console.log(' New card created with text:', currentCardId)
+      } catch (error) {
+        console.error(' Error creating card:', error)
+        return
+      }
+    }
+
+    for (const file of acceptedFiles) {
+      try {
+        await addImageToCard(currentCardId, file)
+        console.log('Image saved:', file.name)
+      } catch (error) {
+        console.error(' Error saving image:', error)
+      }
+    }
+
+    const images = await getImagesByCardId(currentCardId)
+    console.log('📸 Retrieved Images after upload:', images)
+
     setSearchKeyword('')
-
-    // Persist the new card
-    const card = {
-      id: uuid(),
-      doc: yDoc,
-      createdAt: dayjs().toISOString(),
-      spaceId: spaceId,
-    } as ICard
-
-    await createCard(card)
-
-    // Give the editor focus again:
-    editorRef.current?.view?.focus()
+    setCanPost(false)
   }
+
+  const handleOnDrop = (acceptedFiles: File[]) => {
+    setAcceptedFiles(acceptedFiles)
+  }
+
   return (
     <div>
-      <ContentCard
-        sx={{
-          position: 'relative',
-          pb: 4,
-        }}
-        isScaled={false}
-      >
+      <ContentCard sx={{ position: 'relative', pb: 4 }} isScaled={false}>
         <ContentWrapper scaleFactor={1}>
           <CardContent>
             <Typography
@@ -68,14 +87,33 @@ const NewCard = ({ spaceId }: NewCardProps) => {
             <Tiptap
               yDoc={tempDoc}
               setCanPost={setCanPost}
-              onPost={() => handlePost(tempDoc)}
+              onPost={handlePost}
               editorRef={editorRef}
             />
+
+            <Dropzone onDrop={handleOnDrop}>
+              {({ getRootProps, getInputProps }) => (
+                <section>
+                  <div
+                    {...getRootProps()}
+                    style={{
+                      border: '1px dashed gray',
+                      padding: '10px',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <input {...getInputProps()} />
+                    <p>📂 Drag & Drop files here, or click to select</p>
+                  </div>
+                </section>
+              )}
+            </Dropzone>
+
             {canPost && (
               <Button
                 variant="contained"
                 color="primary"
-                onClick={() => handlePost(tempDoc)}
+                onClick={handlePost}
                 disabled={!canPost}
                 sx={{
                   position: 'absolute',
@@ -85,7 +123,7 @@ const NewCard = ({ spaceId }: NewCardProps) => {
                   borderRadius: 0,
                 }}
               >
-                PRESS CTRL+ENTER TO SAVE
+                PRESS CTRL+ENTER TO SAVe
               </Button>
             )}
           </CardContent>

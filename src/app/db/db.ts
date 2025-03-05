@@ -43,9 +43,19 @@ export interface ISpaceList extends ISpace {
   cards: ICard[]
 }
 
+export interface IImage {
+  id: string
+  createdAt: string
+  cardId?: string
+  file: Blob
+  fileType: string
+  realmId?: string
+}
+
 export class DexieStarter extends Dexie {
   cards!: Table<ICard, string>
   spaces!: Table<ISpace, string>
+  image!: Table<IImage, string>
 
   constructor() {
     super('DexieStarter', {
@@ -64,6 +74,7 @@ export class DexieStarter extends Dexie {
         id,
         title`,
       setting_local: '++id, key',
+      image: `id, cardId, realmId`,
     })
 
     // A trigger to set the docHtml string attribute from Y.Doc content
@@ -126,6 +137,61 @@ export class DexieStarter extends Dexie {
       }
     })
   }
+}
+
+export async function addImageToCard(cardId: string, file: File) {
+  const card = await db.cards.where('id').equals(cardId).first()
+  if (!card) {
+    console.error('Card not found for image')
+    return
+  }
+  const newImage: IImage = {
+    id: crypto.randomUUID(),
+    createdAt: new Date().toISOString(),
+    cardId,
+    file: file,
+    fileType: file.type,
+    realmId: card?.realmId,
+  }
+  console.log('DB Image Table:', db.image)
+
+  await db.image.add(newImage)
+  return newImage
+}
+
+export async function getImagesByCardId(cardId: string) {
+  console.log(`Fetching images for cardId: ${cardId}`)
+
+  const images = await db.image.where('cardId').equals(cardId).toArray()
+
+  console.log('Retrieved Images:', images)
+
+  if (images.length === 0) {
+    console.warn(`No images cardId: ${cardId}`)
+  }
+
+  return Promise.all(
+    images.map(async (image) => {
+      const fileUrl = await blobToBase64(image.file)
+      console.log(`Image ${image.id} URL:`, fileUrl)
+      return {
+        id: image.id,
+        createdAt: image.createdAt,
+        cardId: image.cardId,
+        fileType: image.fileType,
+        fileUrl: fileUrl,
+      }
+    }),
+  )
+}
+
+export function blobToBase64(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result as string)
+    reader.onerror = reject
+    reader.readAsDataURL(blob)
+  })
 }
 
 export const createCard = async (card: ICard) => {
