@@ -9,7 +9,6 @@ import {
   alpha,
   TextField,
 } from '@mui/material'
-import { v4 as uuid } from 'uuid'
 import BookmarksIcon from '@mui/icons-material/Bookmarks'
 import Dialog from '@mui/material/Dialog'
 import DialogContent from '@mui/material/DialogContent'
@@ -21,7 +20,7 @@ import ItemCard, { FIXED_HEIGHT } from '@/app/components/ItemCard'
 import theme from '@/theme'
 import Link from 'next/link'
 import Avatars from '@/app/components/Avatars'
-import MyDropzone from '@/app/components/FileUpload'
+import { v4 as uuid } from 'uuid'
 
 export default function Spaces() {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -52,7 +51,6 @@ export default function Spaces() {
         }}
       >
         <Typography variant="h5">All spaces</Typography>
-        <MyDropzone />
         <Chip
           icon={<WorkspacesIcon />}
           label="New space"
