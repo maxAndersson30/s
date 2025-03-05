@@ -123,7 +123,7 @@ const NewCard = ({ spaceId }: NewCardProps) => {
                   borderRadius: 0,
                 }}
               >
-                PRESS CTRL+ENTER TO SAVE
+                PRESS CTRL+ENTER TO SAVe
               </Button>
             )}
           </CardContent>
