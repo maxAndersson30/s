@@ -48,7 +48,7 @@ export interface IImage {
   createdAt: string
   cardId?: string
   file: Blob
-  fileType: string // ex. 'image/png' or 'image/jpeg'
+  fileType: string
   realmId?: string
 }
 
@@ -74,7 +74,7 @@ export class DexieStarter extends Dexie {
         id,
         title`,
       setting_local: '++id, key',
-      IFile: `id, cardId, realmId`,
+      image: `id, cardId, realmId`,
     })
 
     // A trigger to set the docHtml string attribute from Y.Doc content
@@ -149,16 +149,40 @@ export async function addImageToCard(cardId: string, file: File) {
     id: crypto.randomUUID(),
     createdAt: new Date().toISOString(),
     cardId,
-    file: file, // Dexie klarar av att lagra Blob/File direkt
+    file: file,
     fileType: file.type,
     realmId: card?.realmId,
   }
+  console.log('DB Image Table:', db.image)
+
   await db.image.add(newImage)
   return newImage
 }
 
 export async function getImagesByCardId(cardId: string) {
-  return await db.image.where('cardId').equals(cardId).toArray()
+  console.log(`Fetching images for cardId: ${cardId}`)
+
+  const images = await db.image.where('cardId').equals(cardId).toArray()
+
+  console.log('Retrieved Images:', images)
+
+  if (images.length === 0) {
+    console.warn(`No images cardId: ${cardId}`)
+  }
+
+  return Promise.all(
+    images.map(async (image) => {
+      const fileUrl = await blobToBase64(image.file)
+      console.log(`Image ${image.id} URL:`, fileUrl)
+      return {
+        id: image.id,
+        createdAt: image.createdAt,
+        cardId: image.cardId,
+        fileType: image.fileType,
+        fileUrl: fileUrl,
+      }
+    }),
+  )
 }
 
 export function blobToBase64(blob: Blob): Promise<string> {
